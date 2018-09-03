@@ -143,12 +143,12 @@ func (c *FakeClient) List(router storage.ServiceAddr) ([]storage.ServiceAddr, er
 func (c *FakeClient) Heartbeat(router, node storage.ServiceAddr) error {
 	c.Lock()
 	defer c.Unlock()
-	if c.n == 10 {
+	if c.n == 2 {
 		// long heartbeat
 		time.Sleep(c.skip)
 	} else {
 		if t := time.Since(c.last); t > 2*c.d {
-			c.t.Fatalf("Interval between heartbeats was to long: %v", t)
+			c.t.Fatalf("Interval between heartbeats was too long: %v", t)
 		}
 	}
 	c.last = time.Now()
@@ -158,7 +158,7 @@ func (c *FakeClient) Heartbeat(router, node storage.ServiceAddr) error {
 
 func TestHeartbeat(t *testing.T) {
 	var (
-		d    = 10 * time.Millisecond
+		d    = 100 * time.Millisecond
 		skip = 300 * time.Millisecond
 	)
 
@@ -181,36 +181,36 @@ func TestHeartbeat(t *testing.T) {
 	c.Lock()
 	defer c.Unlock()
 	if t := time.Since(c.last); t > 2*c.d {
-		c.t.Fatalf("Interval between heartbeats was to long: %v", t)
+		c.t.Fatalf("Interval between heartbeats was too long: %v", t)
 	}
 }
 
-type FakeClientPauseStart struct {
+type FakeClientStopHeartbeat struct {
 	sync.Mutex
 	stopped  bool
 	received bool
 	t        *testing.T
 }
 
-func (c *FakeClientPauseStart) NodesFind(router storage.ServiceAddr, k storage.RecordID) ([]storage.ServiceAddr, error) {
+func (c *FakeClientStopHeartbeat) NodesFind(router storage.ServiceAddr, k storage.RecordID) ([]storage.ServiceAddr, error) {
 	return nil, nil
 }
-func (c *FakeClientPauseStart) List(router storage.ServiceAddr) ([]storage.ServiceAddr, error) {
+func (c *FakeClientStopHeartbeat) List(router storage.ServiceAddr) ([]storage.ServiceAddr, error) {
 	return nil, nil
 }
 
-func (c *FakeClientPauseStart) Heartbeat(router, node storage.ServiceAddr) error {
+func (c *FakeClientStopHeartbeat) Heartbeat(router, node storage.ServiceAddr) error {
 	c.Lock()
+	defer c.Unlock()
 	if c.stopped {
-		c.t.Fatalf("Hearbeat() request after heartbeats were stopped")
+		c.t.Fatalf("Heartbeat() request after heartbeats were stopped")
 	}
 	c.received = true
-	c.Unlock()
 	return nil
 }
 
 func TestStopHeartbeat(t *testing.T) {
-	c := &FakeClientPauseStart{t: t}
+	c := &FakeClientStopHeartbeat{t: t}
 	s := New(Config{
 		Client:    c,
 		Addr:      "test",

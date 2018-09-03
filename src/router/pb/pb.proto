@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+service Router {
+	rpc Heartbeat (HBRequest) returns (HBReply) {}
+	rpc NodesFind (NFRequest) returns (NFReply) {}
+	rpc List (Empty) returns (ListReply) {}
+}
+
+
+message HBRequest {
+	string node = 1;
+}
+
+message HBReply {
+	int32 status = 1;
+	string error = 2;
+}
+
+message NFRequest {
+	uint32 key = 1;
+}
+
+message NFReply {
+	int32 status = 1;
+	string error = 2;
+	repeated string nodes = 3;
+}
+
+message Empty {}
+
+message ListReply {
+	int32 status = 1;
+	string error = 2;
+	repeated string nodes = 3;
+}

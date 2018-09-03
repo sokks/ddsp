@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+service Storage {
+	rpc Get (GetRequest) returns (GetReply) {}
+	rpc Put (PutRequest) returns (PutReply) {}
+	rpc Del (DelRequest) returns (DelReply) {}
+}
+
+message GetRequest {
+	uint32 key = 1;
+}
+
+message GetReply {
+	int32 status = 1;
+	string error = 2;
+	bytes data = 3;
+}
+
+message PutRequest {
+	uint32 key = 1;
+	bytes data = 2;
+}
+
+message PutReply {
+	int32 status = 1;
+	string error = 2;
+}
+
+message DelRequest {
+	uint32 key = 1;
+}
+
+message DelReply {
+	int32 status = 1;
+	string error = 2;
+}

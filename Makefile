@@ -24,19 +24,19 @@ clean:
 	rm -rf bin/*
 
 test-node:
-	GOPATH="$(GOPATH)" go test $(NODE) -count=1
-	GOPATH="$(GOPATH)" go test $(NODE) -count=1 -race
+	GOPATH="$(GOPATH)" go test $(NODE) -count=1 -v
+	GOPATH="$(GOPATH)" go test $(NODE) -count=1 -race -v
 
 test-router:
-	GOPATH="$(GOPATH)" go test $(ROUTER) -count=1
-	GOPATH="$(GOPATH)" go test $(ROUTER) -count=1 -race
+	GOPATH="$(GOPATH)" go test $(ROUTER) -count=1 -v
+	GOPATH="$(GOPATH)" go test $(ROUTER) -count=1 -race -v
 
 test-fe:
-	GOPATH="$(GOPATH)" go test $(FRONTEND) -count=1
-	GOPATH="$(GOPATH)" go test $(FRONTEND) -count=1 -race
+	GOPATH="$(GOPATH)" go test $(FRONTEND) -count=1 -v
+	GOPATH="$(GOPATH)" go test $(FRONTEND) -count=1 -race -v
 
 test-integration:
-	GOPATH="$(GOPATH)" go test integration_test -count=1
+	GOPATH="$(GOPATH)" go test integration_test -count=1 -v
 
 test: test-node test-router test-fe test-integration
 

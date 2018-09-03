@@ -19,7 +19,7 @@ Replication Factor: 3, quorum: 2, язык разработки: [go](https://go
 В качестве *ключа* используется uint32, в качестве *значения* -- произовольный набор байт.
 
 **Основной документацией** к *хранилищу* являются тесты,
-содержащиеся в репозитории и [godoc](https://godoc.org/github.com/n-canter/ddsp).
+содержащиеся в репозитории и godoc ([node](https://godoc.org/github.com/n-canter/ddsp/src/node/node), [router](https://godoc.org/github.com/n-canter/ddsp/src/router/router), [frontend](https://godoc.org/github.com/n-canter/ddsp/src/frontend/frontend)).
 
 *Хранилище* позволяет выполнить следующие операции:
 1. Put(key, value) -- добавление элемента

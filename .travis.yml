@@ -1,5 +1,7 @@
 sudo: false
 language: go
+notifications:
+  slack: trhiod:jPMG33OjA4tuxP7iQjYguVfh
 
 go:
   - master

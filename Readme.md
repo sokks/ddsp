@@ -31,7 +31,7 @@ Replication Factor: 3, quorum: 2, язык разработки: [go](https://go
 Рассмотрим подробнее эти операции.
 ### Put (key, value) ###
 Frontend выполняет следующие действия: 
-1. Отправляет запрос NodesFind(key, nodes) в Router (nodes -- список доступных Nodes).
+1. Отправляет запрос NodesFind(key) в Router.
 2. Параллельно кладет значение value по ключу key в каждый из node, которые вернул запрос NodesFor(key, nodes).
 
 Если NodesFor(key) возвращает ошибку, то ошибка немедленно возвращается клиенту.
@@ -41,7 +41,7 @@ Frontend выполняет следующие действия:
 Delete работает по аналогии с Put.
 
 Frontend выполняет следующие действия: 
-1. Отправляет запрос NodesFind(key, nodes) в Router (nodes -- список доступных Nodes).
+1. Отправляет запрос NodesFind(key) в Router.
 2. Параллельно отправляет Delete(key) в каждый из node, которые вернул запрос NodesFor(key, nodes).
 
 Если NodesFor(key) возвращает ошибку, то ошибка немедленно возвращается клиенту.

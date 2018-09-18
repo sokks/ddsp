@@ -90,8 +90,8 @@ Frontend выполняет следующие действия для выпо�
 
 Список частей (в скобочках команда для запуска тестов):
 1. Node (`make test-node`)
-2. Frontend (`make test-fe`)
-3. Router + Integration Tests (`make test-router && make test-integration`)
+2. Router (`make test-router`)
+3. Frontend + Integration Tests (`make test-fe && make test-integration`)
 
 Количество частей, сданных студентом влияет на финальную оценку за курс.
 

@@ -33,7 +33,7 @@ type Node struct {
 	hbStop chan struct{}
 
 	storage map[storage.RecordID][]byte
-	lock    *sync.RWMutex
+	lock    sync.RWMutex
 }
 
 // New creates a new Node with a given cfg.
@@ -44,7 +44,6 @@ func New(cfg Config) *Node {
 		cfg:     cfg,
 		hbStop:  make(chan struct{}),
 		storage: make(map[storage.RecordID][]byte, 100),
-		lock:    &sync.RWMutex{},
 	}
 	return n
 }

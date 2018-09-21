@@ -100,7 +100,7 @@ func (nf NodesFinder) NodesFind(k storage.RecordID, nodes []storage.ServiceAddr)
 	}
 
 	sort.Slice(nodeHashes, func(i, j int) bool {
-		return nodeHashes[i].hash > nodeHashes[j].hash || nodeHashes[i].node <= nodeHashes[j].node
+		return nodeHashes[i].hash > nodeHashes[j].hash || nodeHashes[i].node >= nodeHashes[j].node
 	})
 
 	n := storage.ReplicationFactor

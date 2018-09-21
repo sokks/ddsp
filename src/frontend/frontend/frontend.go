@@ -50,8 +50,7 @@ type Frontend struct {
 // New создает новый Frontend с данным cfg.
 func New(cfg Config) *Frontend {
 	return &Frontend{
-		cfg:   cfg,
-		nodes: nil,
+		cfg: cfg,
 	}
 }
 
@@ -70,19 +69,16 @@ func (fe *Frontend) Put(k storage.RecordID, d []byte) error {
 		return storage.ErrNotEnoughDaemons
 	}
 
-	wg := sync.WaitGroup{}
 	results := make(chan error, len(nodes))
-	wg.Add(len(nodes))
 	for i, node := range nodes {
 		go func(nodeIdx int, node storage.ServiceAddr) {
-			defer wg.Done()
 			results <- fe.cfg.NC.Put(node, k, d)
 		}(i, node)
 	}
-	wg.Wait()
-	close(results)
 
-	return checkErrors(results)
+	err = checkErrors(results, len(nodes))
+	close(results)
+	return err
 }
 
 // Del an item from the storage if an item exists for the given key.
@@ -100,37 +96,32 @@ func (fe *Frontend) Del(k storage.RecordID) error {
 		return storage.ErrNotEnoughDaemons
 	}
 
-	wg := sync.WaitGroup{}
-
 	results := make(chan error, len(nodes))
-	wg.Add(len(nodes))
 	for _, node := range nodes {
 		go func(node storage.ServiceAddr) {
-			defer wg.Done()
 			results <- fe.cfg.NC.Del(node, k)
 		}(node)
 	}
-	wg.Wait()
-	close(results)
 
-	return checkErrors(results)
+	err = checkErrors(results, len(nodes))
+	close(results)
+	return err
 }
 
-func checkErrors(errs <-chan error) error {
+func checkErrors(errs <-chan error, readLimit int) error {
 	oks := 0
 	resMap := make(map[error]int)
-	for err := range errs {
+
+	for i := 0; i < readLimit; i++ {
+		err := <-errs
 		if err == nil {
 			oks++
+			continue
 		}
-		if _, ok := resMap[err]; !ok {
-			resMap[err] = 1
-		} else {
-			resMap[err]++
-		}
+		resMap[err]++
 	}
 
-	if oks > storage.MinRedundancy {
+	if oks >= storage.MinRedundancy {
 		return nil
 	}
 	for err, n := range resMap {
@@ -205,46 +196,31 @@ type getResult struct {
 func checkResults(results <-chan getResult, endChan chan<- getResult) {
 	resMap := make(map[string]int)
 	errMap := make(map[string]int)
-	found := false
 
 	for res := range results {
-		if found {
-			continue
-		}
-
 		if res.err == nil {
 			key := string(res.d)
-			updateKey(resMap, key)
+			resMap[key]++
 
 			if resMap[key] >= storage.MinRedundancy {
 				endChan <- res
-				found = true
+				return
 			}
 		} else {
 			key := res.err.Error()
-			updateKey(errMap, key)
+			errMap[key]++
 
 			if errMap[key] >= storage.MinRedundancy {
 				endChan <- res
-				found = true
+				return
 			}
 		}
 	}
 
-	if !found {
-		endChan <- struct {
-			d   []byte
-			err error
-		}{
-			err: storage.ErrQuorumNotReached,
-		}
-	}
-}
-
-func updateKey(m map[string]int, k string) {
-	if _, ok := m[k]; !ok {
-		m[k] = 1
-	} else {
-		m[k]++
+	endChan <- struct {
+		d   []byte
+		err error
+	}{
+		err: storage.ErrQuorumNotReached,
 	}
 }

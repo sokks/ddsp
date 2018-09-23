@@ -17,7 +17,9 @@ $(STORAGE_PB_FILE):
 $(ROUTER_PB_FILE):
 	protoc -I $(ROUTER_PB) $(ROUTER_PB)/pb.proto --go_out=plugins=grpc:$(ROUTER_PB)
 
-build: $(STORAGE_PB_FILE) $(ROUTER_PB_FILE)
+gen: $(STORAGE_PB_FILE) $(ROUTER_PB_FILE)
+
+build: gen
 	GOPATH="$(GOPATH)" go install node
 	GOPATH="$(GOPATH)" go install router
 	GOPATH="$(GOPATH)" go install frontend
@@ -45,4 +47,4 @@ test-integration:
 test: test-node test-router test-fe test-integration
 
 
-.PHONY: build clean test test-node test-router test-fe test-integration
+.PHONY: build clean gen test test-node test-router test-fe test-integration

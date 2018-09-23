@@ -148,24 +148,17 @@ func (fe *Frontend) Get(k storage.RecordID) ([]byte, error) {
 	resChan := make(chan getResult, len(nodes))
 	endChan := make(chan getResult)
 
-	go checkResults(resChan, endChan)
+	go checkResults(resChan, endChan, len(nodes))
 
-	go func() {
-		var wg sync.WaitGroup
-		wg.Add(len(nodes))
-		for _, node := range nodes {
-			go func(node storage.ServiceAddr) {
-				defer wg.Done()
-				d, err := fe.cfg.NC.Get(node, k)
-				resChan <- struct {
-					d   []byte
-					err error
-				}{d, err}
-			}(node)
-		}
-		wg.Wait()
-		close(resChan)
-	}()
+	for _, node := range nodes {
+		go func(node storage.ServiceAddr) {
+			d, err := fe.cfg.NC.Get(node, k)
+			resChan <- struct {
+				d   []byte
+				err error
+			}{d, err}
+		}(node)
+	}
 
 	res := <-endChan
 
@@ -176,14 +169,14 @@ func (fe *Frontend) initNodes() {
 	var err error
 	var nodes []storage.ServiceAddr
 
-	nodes, err = fe.cfg.RC.List(fe.cfg.Router)
-	if err != nil {
-		time.Sleep(InitTimeout)
+	for {
 		nodes, err = fe.cfg.RC.List(fe.cfg.Router)
-		if err != nil {
-			return
+		if err == nil {
+			break
 		}
+		time.Sleep(InitTimeout)
 	}
+
 	fe.nodes = nodes
 	return
 }
@@ -193,11 +186,12 @@ type getResult struct {
 	err error
 }
 
-func checkResults(results <-chan getResult, endChan chan<- getResult) {
+func checkResults(results <-chan getResult, endChan chan<- getResult, readLimit int) {
 	resMap := make(map[string]int)
 	errMap := make(map[string]int)
 
-	for res := range results {
+	for i := 0; i < readLimit; i++ {
+		res := <-results
 		if res.err == nil {
 			key := string(res.d)
 			resMap[key]++

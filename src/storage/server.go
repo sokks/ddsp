@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -27,6 +28,7 @@ type Server struct {
 }
 
 func NewServer(st Storage, addr string) *Server {
+	log.SetOutput(os.Stdout)
 	return &Server{
 		addr: addr,
 		st:   st,

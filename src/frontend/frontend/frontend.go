@@ -188,7 +188,7 @@ type getResult struct {
 
 func checkResults(results <-chan getResult, endChan chan<- getResult, readLimit int) {
 	resMap := make(map[string]int)
-	errMap := make(map[string]int)
+	errMap := make(map[error]int)
 
 	for i := 0; i < readLimit; i++ {
 		res := <-results
@@ -201,7 +201,7 @@ func checkResults(results <-chan getResult, endChan chan<- getResult, readLimit 
 				return
 			}
 		} else {
-			key := res.err.Error()
+			key := res.err
 			errMap[key]++
 
 			if errMap[key] >= storage.MinRedundancy {

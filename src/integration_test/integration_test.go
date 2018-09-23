@@ -17,7 +17,7 @@ import (
 	"testing"
 )
 
-const n = 10
+const n = 1000
 
 var (
 	router storage.ServiceAddr = "127.0.0.1:7320"

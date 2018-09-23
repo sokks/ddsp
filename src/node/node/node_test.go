@@ -56,7 +56,7 @@ func TestDel(t *testing.T) {
 	key := storage.RecordID(1)
 	data := []byte("some data")
 	if err := s.Del(key); err != storage.ErrRecordNotFound {
-		t.Fatalf("Del(): got error %v, got %v", err, storage.ErrRecordNotFound)
+		t.Fatalf("Del(): got error %v, want %v", err, storage.ErrRecordNotFound)
 	}
 
 	if err := s.Put(key, data); err != nil {

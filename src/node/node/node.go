@@ -17,8 +17,8 @@ type Config struct {
 	// Router is an address of Router service.
 	// Router -- адрес Router service.
 	Router storage.ServiceAddr
-	// Hearbeat is a time interval between hearbeats.
-	// Hearbeat -- интервал между двумя heartbeats.
+	// Heartbeat is a time interval between heartbeats.
+	// Heartbeat -- интервал между двумя heartbeats.
 	Heartbeat time.Duration
 
 	// Client specifies client for Router.
@@ -39,10 +39,10 @@ func New(cfg Config) *Node {
 	return nil
 }
 
-// Hearbeats runs heartbeats from node to a router
-// each time interval set by cfg.Hearbeat.
+// Heartbeats runs heartbeats from node to a router
+// each time interval set by cfg.Heartbeat.
 //
-// Hearbeats запускает отправку heartbeats от node к router
+// Heartbeats запускает отправку heartbeats от node к router
 // через каждый интервал времени, заданный в cfg.Heartbeat.
 func (node *Node) Heartbeats() {
 	// TODO: implement

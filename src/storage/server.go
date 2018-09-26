@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -12,7 +13,7 @@ import (
 	"storage/pb"
 )
 
-const Timeout = 2 * time.Second
+const Timeout = 3 * time.Second
 
 type Storage interface {
 	Put(k RecordID, d []byte) error
@@ -27,6 +28,7 @@ type Server struct {
 }
 
 func NewServer(st Storage, addr string) *Server {
+	log.SetOutput(os.Stdout)
 	return &Server{
 		addr: addr,
 		st:   st,
